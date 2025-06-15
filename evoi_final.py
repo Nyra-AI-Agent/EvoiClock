@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import font
 import time
 from datetime import datetime
-import cnlunar
+# import cnlunar # No longer needed
 import os
 
 # --- Constants ---
@@ -91,19 +91,19 @@ class ClockApp:
 
     def update_subtitle(self):
         now = datetime.now()
-        lunar_date = cnlunar.Lunar(now)
+        # lunar_date = cnlunar.Lunar(now) # Removed as per user request
         
         western_date_str = now.strftime("%Y-%m-%d")
-        lunar_info = f"{lunar_date.lunarMonthCn}{lunar_date.lunarDayCn}"
-        jie_qi_str = lunar_date.jie_qi_str
-        if jie_qi_str:
-            jie_qi_str = f" {jie_qi_str}"
+        # lunar_info = f"{lunar_date.lunarMonthCn}{lunar_date.lunarDayCn}" # Removed
+        # jie_qi_str = lunar_date.jie_qi_str # Removed
+        # if jie_qi_str:
+        #     jie_qi_str = f" {jie_qi_str}"
 
         # In Python's strftime, %w is 0 for Sunday. In weekday(), Monday is 0.
         weekday_map = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
         weekday_str = weekday_map[int(now.strftime("%w"))]
 
-        subtitle_text = f"{western_date_str} ({lunar_info}) {weekday_str}{jie_qi_str}"
+        subtitle_text = f"{western_date_str} {weekday_str}"
         self.subtitle_label.config(text=subtitle_text)
         self.root.after(60000, self.update_subtitle) # Update every minute
 
