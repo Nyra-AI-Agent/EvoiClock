@@ -22,15 +22,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install ImageMagick
-      uses: crazy-max/ghaction-setup-imagemagick@v3
-      with:
-        magick-query-version: "7.1.1"
-
-    - name: Convert PNG to ICO
-      run: |
-        magick convert icon-shark2.png -resize 256x256 EvoiClock.ico
-      shell: bash
+    - name: Convert PNG to ICO using Python
+      run: python -c "from PIL import Image; img = Image.open('icon-shark2.png'); img.save('EvoiClock.ico', format='ICO', sizes=[(256,256)])"
 
     - name: Run PyInstaller
       run: |
