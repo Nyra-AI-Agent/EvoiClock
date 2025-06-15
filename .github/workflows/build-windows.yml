@@ -18,10 +18,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r evoi_clock/requirements.txt
+          pip install -r requirements.txt
 
       - name: Convert PNG to ICO using Pillow
-        run: python -c "from PIL import Image; img = Image.open('evoi_clock/icon-shark2.png'); img.save('evoi_clock/EvoiClock.ico', format='ICO', sizes=[(256,256)])"
+        run: python -c "from PIL import Image; img = Image.open('icon-shark2.png'); img.save('EvoiClock.ico', format='ICO', sizes=[(256,256)])"
 
       - name: '[DEBUG] List files before building'
         run: |
@@ -30,10 +30,10 @@ jobs:
         shell: cmd
 
       - name: Run PyInstaller
-        run: pyinstaller --noconfirm --onefile --windowed --name EvoiClock --icon "evoi_clock/EvoiClock.ico" --add-data "evoi_clock/assets;assets" --add-data "evoi_clock/icon-shark2.png;." --distpath "evoi_clock/dist" "evoi_clock/evoi_final.py"
+        run: pyinstaller --noconfirm --onefile --windowed --name EvoiClock --icon "EvoiClock.ico" --add-data "assets;assets" --add-data "icon-shark2.png;." --distpath "dist" "evoi_final.py"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: EvoiClock-windows-exe
-          path: evoi_clock/dist/EvoiClock.exe 
+          path: dist/EvoiClock.exe 
