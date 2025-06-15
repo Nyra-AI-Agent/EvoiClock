@@ -94,7 +94,7 @@ class ClockApp:
         lunar_date = cnlunar.Lunar(now)
         
         western_date_str = now.strftime("%Y-%m-%d")
-        lunar_info = f"{lunar_date.month_str}月{lunar_date.day_str}"
+        lunar_info = f"{lunar_date.lunarMonthCn}{lunar_date.lunarDayCn}"
         jie_qi_str = lunar_date.jie_qi_str
         if jie_qi_str:
             jie_qi_str = f" {jie_qi_str}"
