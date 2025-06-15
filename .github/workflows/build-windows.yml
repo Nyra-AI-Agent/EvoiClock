@@ -1,0 +1,43 @@
+name: Build EvoiClock for Windows
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Install ImageMagick
+      uses: crazy-max/ghaction-setup-imagemagick@v3
+      with:
+        magick-query-version: "7.1.1"
+
+    - name: Convert PNG to ICO
+      run: |
+        magick convert icon-shark2.png -resize 256x256 EvoiClock.ico
+      shell: bash
+
+    - name: Run PyInstaller
+      run: |
+        pyinstaller --onefile --windowed --name EvoiClock --icon="EvoiClock.ico" --add-data "assets/Antonio-Regular.ttf;assets" --add-data "icon-shark2.png;." evoi_final.py
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: EvoiClock-Windows
+        path: dist/EvoiClock.exe 

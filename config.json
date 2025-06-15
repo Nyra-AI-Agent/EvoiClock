@@ -1,0 +1,24 @@
+{
+    "window": {
+        "position": {
+            "x": 100,
+            "y": 100
+        },
+        "opacity": 0.9,
+        "always_on_top": true
+    },
+    "clock": {
+        "mode": "NORMAL",
+        "font_size": 48,
+        "font_family": "Arial",
+        "time_format": "%H:%M:%S"
+    },
+    "quote": {
+        "rotation_interval": 300,
+        "fade_duration": 1.0
+    },
+    "system": {
+        "auto_start": false,
+        "minimize_to_tray": true
+    }
+} 
