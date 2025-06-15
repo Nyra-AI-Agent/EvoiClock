@@ -23,8 +23,14 @@ jobs:
       - name: Convert PNG to ICO using Pillow
         run: python -c "from PIL import Image; img = Image.open('evoi_clock/icon-shark2.png'); img.save('evoi_clock/EvoiClock.ico', format='ICO', sizes=[(256,256)])"
 
+      - name: '[DEBUG] List files before building'
+        run: |
+          echo "--- Listing all files recursively ---"
+          dir /s
+        shell: cmd
+
       - name: Run PyInstaller
-        run: pyinstaller --onefile --windowed --name EvoiClock --icon="evoi_clock/EvoiClock.ico" --add-data "evoi_clock/assets;assets" --add-data "evoi_clock/icon-shark2.png;." --distpath evoi_clock/dist evoi_clock/evoi_final.py
+        run: pyinstaller --noconfirm --onefile --windowed --name EvoiClock --icon "evoi_clock/EvoiClock.ico" --add-data "evoi_clock/assets;assets" --add-data "evoi_clock/icon-shark2.png;." --distpath "evoi_clock/dist" "evoi_clock/evoi_final.py"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
