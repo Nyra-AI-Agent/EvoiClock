@@ -34,7 +34,7 @@ jobs:
 
     - name: Run PyInstaller
       run: |
-        pyinstaller --onefile --windowed --name EvoiClock --icon="EvoiClock.ico" --add-data "assets/Antonio-Regular.ttf;assets" --add-data "icon-shark2.png;." evoi_final.py
+        pyinstaller --onefile --windowed --name EvoiClock --icon="EvoiClock.ico" --add-data "assets;assets" --add-data "icon-shark2.png;." evoi_final.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
