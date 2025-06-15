@@ -1,0 +1,30 @@
+{
+    "project": {
+        "name": "EVOI Trading Clock",
+        "version": "1.0.0",
+        "description": "Windows desktop trading clock application"
+    },
+    "build": {
+        "python_version": "3.8",
+        "dependencies": "requirements.txt",
+        "output_dir": "dist",
+        "icon": "assets/icon.ico"
+    },
+    "test": {
+        "docker": {
+            "image": "windows-servercore-ltsc2019",
+            "ports": ["8080:8080"]
+        },
+        "environments": ["windows", "macos"]
+    },
+    "deploy": {
+        "auto_start": true,
+        "tray_icon": true,
+        "config_backup": true
+    },
+    "monitor": {
+        "log_level": "INFO",
+        "log_file": "logs/app.log",
+        "error_notification": true
+    }
+} 
