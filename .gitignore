@@ -1,17 +1,29 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.so
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Python virtual environment
 venv/
 env/
 .env
 
-# PyInstaller
+# PyInstaller files
 *.spec
-build/
-dist/
+EvoiClock.spec
+
+# Compiled Python files
+*.pyc
+*.pyo
+*.pyd
+
+# C extensions
+*.so
+
+# Caches
+__pycache__/
+.pytest_cache/
 
 # macOS
 .DS_Store 
