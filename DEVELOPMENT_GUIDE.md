@@ -169,43 +169,42 @@ git push origin feat/add-new-quote-animation
 
 ## 階段四：打包與分發 (SOP)
 
-### 使用 PyInstaller 打包
+### macOS 打包
 
-我們使用 `build.sh` 腳本來標準化打包流程。
+我們使用 `build.sh` 腳本來標準化 macOS 的打包流程。
 
 ```bash
-# 確保腳本有執行權限
+# 1. 啟動正確的 Conda 環境
+conda activate tkpy
+
+# 2. 確保腳本有執行權限
 chmod +x build.sh
 
-# 執行打包
+# 3. 執行打包
 ./build.sh
 ```
 
-`build.sh` 腳本的核心指令應如下：
+`build.sh` 腳本會自動處理環境檢查、路徑定位、清理和 PyInstaller 執行。
 
-```shell
-#!/bin/sh
+### Windows 打包 (CI/CD 自動化)
 
-# ... (環境檢查) ...
+Windows 的 `.exe` 應用程式是透過位於 `.github/workflows/build-windows.yml` 的 GitHub Actions 工作流程**自動建置**的。我們**不採用**在本地 Windows 電腦手動打包的方式。
 
-APP_NAME="EvoiClock"
-MAIN_SCRIPT="src/main.py"
-ICON="assets/EvoiClock.icns"
-VERSION="4.2.0" # 應從版本檔案讀取
+**運作方式**:
+1.  當有新的程式碼被推送到 `main` 分支時，此工作流程會自動觸發。
+2.  它會在一個乾淨的、由 GitHub 提供的 Windows 虛擬環境中啟動。
+3.  流程會自動安裝 Python 3.12，並根據 `requirements.txt` 安裝所有依賴。
+4.  它會智慧地使用 `Pillow` 函式庫，將我們在 `assets/` 中的標準 `.icns` 圖示，即時轉換為 Windows 需要的 `.ico` 格式。
+5.  最後，它會執行 PyInstaller，並將所有需要的資源（如 `cnlunar` 函式庫）打包，生成 `EvoiClock.exe`。
+6.  打包完成的 `.exe` 檔案會被上傳到該次 Action 的「Artifacts」(產出物) 中，供開發者下載測試。
 
-# 清理舊的打包文件
-rm -rf dist build *.spec
+**如何取得 Windows 版本**:
+1.  在 GitHub 倉庫頁面，點擊上方的「Actions」分頁。
+2.  在左側選擇「Build EvoiClock for Windows」工作流程。
+3.  點擊最近一次成功運行的紀錄 (會有綠色勾號)。
+4.  在頁面下方的「Artifacts」區塊，點擊「EvoiClock-windows-exe」即可下載。
 
-# 執行 PyInstaller
-pyinstaller --name "$APP_NAME" \
-            --windowed \
-            --onefile \
-            --icon="$ICON" \
-            --add-data "cnlunar:cnlunar" \
-            "$MAIN_SCRIPT"
-
-# ... (可選的 DMG 製作流程) ...
-```
+這個流程確保了 Windows 版本的建置是標準化、自動化且可重現的。
 
 ---
 

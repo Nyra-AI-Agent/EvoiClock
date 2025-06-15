@@ -1,5 +1,5 @@
 pystray
 cnlunar
 Pillow
-pyinstaller==6.9.0
+pyinstaller
 pyinstaller-hooks-contrib==2024.7 

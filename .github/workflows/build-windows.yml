@@ -1,6 +1,11 @@
 name: Build EvoiClock for Windows
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # 允許手動觸發
 
 jobs:
   build:
@@ -8,29 +13,41 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.12' # 與我們的 conda 環境對齊
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Convert PNG to ICO using Pillow
-        run: python -c "from PIL import Image; img = Image.open('icon-shark2.png'); img.save('EvoiClock.ico', format='ICO', sizes=[(256,256)])"
+      - name: Convert master ICNS to ICO for Windows
+        run: |
+          pip install Pillow
+          python -c "from PIL import Image; img = Image.open('assets/EvoiClock.icns'); img.save('assets/EvoiClock.ico', format='ICO', sizes=[(256,256)])"
+        shell: bash
 
-      - name: '[DEBUG] List files before building'
+      - name: '[DEBUG] List files after conversion'
         run: |
           echo "--- Listing all files recursively ---"
           dir /s
         shell: cmd
 
       - name: Run PyInstaller
-        run: pyinstaller --noconfirm --onefile --windowed --name EvoiClock --icon "EvoiClock.ico" --add-data "assets;assets" --add-data "icon-shark2.png;." --distpath "dist" "evoi_final.py"
+        run: |
+          # 動態獲取 cnlunar 的路徑
+          $CNLUNAR_PATH = (python -c "import cnlunar, os; print(os.path.dirname(cnlunar.__file__))")
+          echo "Found cnlunar at $CNLUNAR_PATH"
+          pyinstaller --noconfirm --onefile --windowed `
+            --name "EvoiClock" `
+            --icon "assets/EvoiClock.ico" `
+            --add-data "$CNLUNAR_PATH;cnlunar" `
+            "src/main.py"
+        shell: powershell
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
