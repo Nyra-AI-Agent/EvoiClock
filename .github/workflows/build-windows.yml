@@ -1,39 +1,33 @@
 name: Build EvoiClock for Windows
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+on: [push]
 
 jobs:
-  build-windows:
+  build:
     runs-on: windows-latest
-    defaults:
-      run:
-        working-directory: ./evoi_clock
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r evoi_clock/requirements.txt
 
-    - name: Convert PNG to ICO using Python
-      run: python -c "from PIL import Image; img = Image.open('icon-shark2.png'); img.save('EvoiClock.ico', format='ICO', sizes=[(256,256)])"
+      - name: Convert PNG to ICO using Pillow
+        run: python -c "from PIL import Image; img = Image.open('evoi_clock/icon-shark2.png'); img.save('evoi_clock/EvoiClock.ico', format='ICO', sizes=[(256,256)])"
 
-    - name: Run PyInstaller
-      run: |
-        pyinstaller --onefile --windowed --name EvoiClock --icon="EvoiClock.ico" --add-data "assets;assets" --add-data "icon-shark2.png;." evoi_final.py
+      - name: Run PyInstaller
+        run: pyinstaller --onefile --windowed --name EvoiClock --icon="evoi_clock/EvoiClock.ico" --add-data "evoi_clock/assets;assets" --add-data "evoi_clock/icon-shark2.png;." --distpath evoi_clock/dist evoi_clock/evoi_final.py
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: EvoiClock-Windows
-        path: dist/EvoiClock.exe 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EvoiClock-windows-exe
+          path: evoi_clock/dist/EvoiClock.exe 
