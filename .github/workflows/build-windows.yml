@@ -6,8 +6,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ./evoi_clock
 
     steps:
     - uses: actions/checkout@v3
