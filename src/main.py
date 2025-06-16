@@ -17,12 +17,74 @@ import random
 import platform
 import sys
 import cnlunar
+import os
+import ctypes
+import ctypes.util
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller/py2app """
+    if getattr(sys, 'frozen', False):
+        # Running in a bundle
+        if hasattr(sys, '_MEIPASS'):
+            # PyInstaller
+            base_path = sys._MEIPASS
+        else:
+            # py2app
+            base_path = os.path.join(os.path.dirname(sys.executable), '..', 'Resources')
+    else:
+        # Running in a normal Python environment
+        # The script is in src/, so assets are in ../assets
+        base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+    return os.path.join(base_path, relative_path)
+
+def load_font_for_macos(font_path):
+    """Dynamically loads a font for the application on macOS."""
+    if not os.path.exists(font_path):
+        print(f"Font not found at {font_path}")
+        return False
+
+    core_text_path = ctypes.util.find_library('CoreText')
+    if not core_text_path:
+        print("CoreText framework not found.")
+        return False
+    
+    CoreText = ctypes.CDLL(core_text_path)
+
+    CFURLCreateFromFileSystemRepresentation = CoreText.CFURLCreateFromFileSystemRepresentation
+    CFURLCreateFromFileSystemRepresentation.restype = ctypes.c_void_p
+    CFURLCreateFromFileSystemRepresentation.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_long, ctypes.c_bool]
+
+    CTFontManagerRegisterFontsForURL = CoreText.CTFontManagerRegisterFontsForURL
+    CTFontManagerRegisterFontsForURL.restype = ctypes.c_bool
+    CTFontManagerRegisterFontsForURL.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_void_p]
+
+    font_path_bytes = font_path.encode('utf-8')
+    font_url = CFURLCreateFromFileSystemRepresentation(None, font_path_bytes, len(font_path_bytes), False)
+
+    if not font_url:
+        print("Failed to create CFURL from font path.")
+        return False
+
+    if CTFontManagerRegisterFontsForURL(font_url, 1, None): # kCTFontManagerScopeProcess = 1
+        print(f"Successfully registered font: {os.path.basename(font_path)}")
+        return True
+    else:
+        print("Failed to register font.")
+        return False
 
 class ModernFontManager:
     """現代化字體管理器 (移除粗體)"""
     def __init__(self):
+        self._setup_fonts()
         self.fonts = self._load_fonts()
         
+    def _setup_fonts(self):
+        if platform.system() == "Darwin":
+            font_path = resource_path("assets/Antonio-Regular.ttf")
+            if not load_font_for_macos(font_path):
+                print("Falling back to default system fonts.")
+
     def _load_fonts(self):
         system = platform.system()
         if system == "Darwin":

@@ -1,88 +1,64 @@
-#!/bin/bash
+#!/bin/sh
+set -e # Exit immediately if a command exits with a non-zero status.
 
-# EvoiClock 標準化打包腳本 for macOS
-# 遵循 DEVELOPMENT_GUIDE.md 中定義的 SOP
+# --- EvoiClock Build Script for macOS using PyInstaller ---
+# This script standardizes the local build process for the EvoiClock.app bundle.
+# It ensures the correct Conda environment is used and all assets are included.
 
-# --- 前置檢查 ---
-echo "INFO: 正在檢查 Conda 環境..."
-if [[ "$CONDA_DEFAULT_ENV" != "tkpy" ]]; then
-    echo "ERROR: 當前非 'tkpy' 環境！"
-    echo "請先執行 'conda activate tkpy' 後再重新運行此腳本。"
-    exit 1
-fi
+echo "--- EvoiClock Build Script (PyInstaller) ---"
 
-# --- 變數定義 ---
-APP_NAME="EvoiClock"
+# --- Configuration ---
+CONDA_ENV_NAME="tkpy"
 MAIN_SCRIPT="src/main.py"
+APP_NAME="EvoiClock"
 ICON="assets/EvoiClock.icns"
-VERSION="4.2.0"
+# Add assets and cnlunar as resources
+# The format is 'source:destination_in_bundle'
+ASSETS_DATA="assets:assets"
+CNLUNAR_DATA="src/cnlunar:cnlunar"
 
-# --- 強制指定 tkpy 環境中的絕對路徑 (解決 PATH 問題) ---
-CONDA_ENV_PATH="/Users/xy2024air15/miniforge3/envs/tkpy"
-PYTHON_EXEC="${CONDA_ENV_PATH}/bin/python"
-PYINSTALLER_EXEC="${CONDA_ENV_PATH}/bin/pyinstaller"
+# --- (1/4) Environment Checks ---
+echo "\n[1/4] Checking for Conda environment '$CONDA_ENV_NAME'..."
 
-
-echo "INFO: 正在檢查必要工具..."
-if ! command -v "$PYINSTALLER_EXEC" &> /dev/null; then
-    echo "ERROR: 找不到 PyInstaller 執行檔於: $PYINSTALLER_EXEC"
-    echo "請確認 'tkpy' 環境已正確建立。"
+# Check if conda is available
+if ! command -v conda &> /dev/null
+then
+    echo "Error: conda command not found."
+    echo "Please make sure Conda (or Miniforge/Anaconda) is installed and configured in your shell."
     exit 1
 fi
 
-echo "========================================="
-echo "開始打包 $APP_NAME v$VERSION for macOS"
-echo "========================================="
-echo "主程式: $MAIN_SCRIPT"
-echo "圖示:   $ICON"
-echo "Python 直譯器: $PYTHON_EXEC"
-echo "PyInstaller 路徑: $PYINSTALLER_EXEC"
-echo "-----------------------------------------"
-
-# --- 清理舊檔案 ---
-echo "INFO: 正在清理舊的打包文件..."
-rm -rf dist/ build/ "$APP_NAME.spec"
-echo "INFO: 清理完成。"
-
-# --- 執行 PyInstaller ---
-echo "INFO: 正在執行 PyInstaller..."
-
-# 使用絕對路徑的 Python 獲取 cnlunar 的絕對路徑
-CNLUNAR_PATH=$($PYTHON_EXEC -c "import cnlunar; import os; print(os.path.dirname(cnlunar.__file__))")
-
-if [ -z "$CNLUNAR_PATH" ]; then
-    echo "ERROR: 無法找到 cnlunar 函式庫的路徑！"
-    exit 1
-fi
-echo "INFO: 找到 cnlunar 路徑於: $CNLUNAR_PATH"
-
-"$PYINSTALLER_EXEC" --name "$APP_NAME" \
-            --windowed \
-            --onefile \
-            --icon="$ICON" \
-            --add-data "${CNLUNAR_PATH}:cnlunar" \
-            "$MAIN_SCRIPT"
-
-# 檢查打包是否成功
-if [ $? -ne 0 ]; then
-    echo "ERROR: PyInstaller 打包失敗。請檢查上方輸出訊息。"
+# Check if the target environment exists
+if ! conda env list | grep -q "$CONDA_ENV_NAME"; then
+    echo "Error: Conda environment '$CONDA_ENV_NAME' not found."
+    echo "Please create it first using the instructions in DEVELOPMENT_GUIDE.md"
     exit 1
 fi
 
-echo "-----------------------------------------"
-echo "🎉 SUCCESS: $APP_NAME.app 已成功建立於 dist/ 目錄下！"
-echo "========================================="
+echo "Environment check passed."
 
-# --- (可選) 建立 DMG ---
-# 待未來實現，可參考 create-dmg 工具
-# create-dmg \
-#   --volname "$APP_NAME Installer" \
-#   --volicon "$ICON" \
-#   --window-pos 200 120 \
-#   --window-size 800 400 \
-#   --icon-size 100 \
-#   --icon "$APP_NAME.app" 200 190 \
-#   --hide-extension "$APP_NAME.app" \
-#   --app-drop-link 600 185 \
-#   "dist/$APP_NAME-$VERSION.dmg" \
-#   "dist/" 
+
+# --- (2/4) Cleaning up old build artifacts ---
+echo "\n[2/4] Cleaning up old build artifacts..."
+rm -rf dist build *.spec
+echo "Cleanup complete."
+
+
+# --- (3/4) Running PyInstaller build process ---
+echo "\n[3/4] Running PyInstaller build process within '$CONDA_ENV_NAME' environment..."
+
+# Run PyInstaller within the specified conda environment
+conda run -n "$CONDA_ENV_NAME" pyinstaller --noconfirm --windowed --onefile \
+    --name "$APP_NAME" \
+    --icon "$ICON" \
+    --add-data "$CNLUNAR_DATA" \
+    --add-data "$ASSETS_DATA" \
+    "$MAIN_SCRIPT"
+
+echo "PyInstaller process finished."
+
+
+# --- (4/4) Build Complete! ---
+echo "\n[4/4] Build complete!"
+echo "You can find the application bundle in the 'dist' folder:"
+ls -l dist 
