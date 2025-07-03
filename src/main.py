@@ -181,6 +181,7 @@ class EVOIMultiStateClock:
     def __init__(self):
         self.font_manager = ModernFontManager()
         self.root = tk.Tk()
+        self.root.withdraw() # 先隱藏主視窗
         
         self.digit_height = 70 # 固定數字高度
 
@@ -447,6 +448,18 @@ class EVOIMultiStateClock:
             self.animation_running = False
             self.apply_theme(self.current_mode)
 
+    def _check_fonts_on_macos(self):
+        """(Internal) Checks for 'Antonio' font on macOS and prints a warning if not found."""
+        if platform.system() == "Darwin":
+            try:
+                # 使用主視窗實例來檢查字體
+                fonts = list(font.families(self.root))
+                if "Antonio" not in fonts:
+                    print("⚠️ 警告：未找到 'Antonio' 字體，將使用預設字體。")
+                    print("   請確認字體是否已正確安裝並在 Font Book 中啟用。")
+            except Exception as e:
+                print(f"Font check failed: {e}")
+
     def update_clock(self):
         try:
             now = datetime.datetime.now()
@@ -483,23 +496,12 @@ class EVOIMultiStateClock:
         self.update_clock()
         
     def run(self):
+        self._check_fonts_on_macos() # 在視窗顯示前檢查字體
         self.root.deiconify()
         self.root.lift()
         self.root.focus_force()
         self.root.mainloop()
 
 if __name__ == "__main__":
-    if platform.system() == "Darwin":
-        try:
-            root = tk.Tk()
-            root.withdraw()
-            fonts = list(font.families())
-            if "Antonio" not in fonts:
-                print("⚠️ 警告：未找到 'Antonio' 字體，將使用預設字體。")
-                print("   請確認字體是否已正確安裝並在 Font Book 中啟用。")
-            root.destroy()
-        except Exception:
-            pass
-
     app = EVOIMultiStateClock()
     app.run()
