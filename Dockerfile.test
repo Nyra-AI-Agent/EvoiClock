@@ -1,0 +1,31 @@
+# 容器化字體測試 Dockerfile (簡化版)
+FROM python:3.11-slim
+
+# 安裝必要的系統依賴 (分階段安裝以避免網路問題)
+RUN apt-get update && apt-get install -y \
+    python3-tk \
+    fontconfig \
+    fonts-dejavu \
+    && rm -rf /var/lib/apt/lists/*
+
+# 創建工作目錄
+WORKDIR /app
+
+# 複製字體文件
+COPY assets/ /app/assets/
+
+# 複製 Python 依賴
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 複製源代碼
+COPY src/ /app/src/
+
+# 設置字體環境
+ENV FONTCONFIG_PATH=/etc/fonts
+
+# 創建用戶字體目錄
+RUN mkdir -p /root/.fonts
+
+# 預設命令：運行字體測試 (無GUI模式)
+CMD ["python", "-c", "import sys; sys.path.append('/app/src'); from font_manager_container import ContainerFontManager; fm = ContainerFontManager(); fm.test_fonts(); print('\\n✅ 容器化字體測試完成!')"] 

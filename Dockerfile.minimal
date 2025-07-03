@@ -1,0 +1,22 @@
+# 最小化容器測試 - 使用無 GUI 字體管理器
+FROM python:3.11-slim
+
+# 安裝 fontconfig (字體管理工具)
+RUN apt-get update && apt-get install -y \
+    fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
+# 創建工作目錄
+WORKDIR /app
+
+# 複製字體文件
+COPY assets/ /app/assets/
+
+# 複製無 GUI 字體管理器
+COPY src/font_manager_headless.py /app/
+
+# 設置環境變數
+ENV PYTHONPATH=/app
+
+# 運行無 GUI 字體測試
+CMD ["python", "font_manager_headless.py"] 

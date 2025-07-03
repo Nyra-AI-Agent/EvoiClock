@@ -1,0 +1,173 @@
+{
+    "comment": "Windows MCP配置模板 - 正確的7個官方MCP服務器 + 2個專用服務器",
+    "lastUpdated": "2025-07-03-2130",
+    "setup_steps": [
+        "1. git clone https://github.com/modelcontextprotocol/servers.git mcp-servers",
+        "2. cd mcp-servers && npm install && npm run build",
+        "3. 為Python服務器建立虛擬環境: cd src/fetch && python -m venv venv && venv\\Scripts\\activate && pip install -e .",
+        "4. 重複步驟3 for git and time folders",
+        "5. 複製以下配置到 C:\\Users\\[USERNAME]\\AppData\\Roaming\\Cursor\\User\\globalStorage\\cursor.mcp\\mcp.json"
+    ],
+    "targetPath": "C:\\Users\\[USERNAME]\\AppData\\Roaming\\Cursor\\User\\globalStorage\\cursor.mcp\\mcp.json",
+    "mcpServers": {
+        "task-master-ai": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "--package=task-master-ai",
+                "task-master-ai"
+            ],
+            "env": {
+                "ANTHROPIC_API_KEY": "ANTHROPIC_API_KEY_HERE",
+                "PERPLEXITY_API_KEY": "PERPLEXITY_API_KEY_HERE",
+                "OPENAI_API_KEY": "OPENAI_API_KEY_HERE",
+                "GOOGLE_API_KEY": "GOOGLE_API_KEY_HERE",
+                "XAI_API_KEY": "XAI_API_KEY_HERE",
+                "OPENROUTER_API_KEY": "OPENROUTER_API_KEY_HERE",
+                "MISTRAL_API_KEY": "MISTRAL_API_KEY_HERE",
+                "AZURE_OPENAI_API_KEY": "AZURE_OPENAI_API_KEY_HERE",
+                "OLLAMA_API_KEY": "OLLAMA_API_KEY_HERE"
+            }
+        },
+        "obsidian-xysb": {
+            "command": "npx",
+            "args": [
+                "-y", 
+                "mcp-obsidian",
+                "C:\\Users\\[USERNAME]\\Documents\\XYSB"
+            ],
+            "env": {
+                "OBSIDIAN_API_KEY": "YOUR_OBSIDIAN_API_KEY_HERE",
+                "OBSIDIAN_HOST": "127.0.0.1",
+                "OBSIDIAN_PORT": "27124"
+            }
+        },
+        "filesystem": {
+            "command": "node",
+            "args": ["C:\\Users\\[USERNAME]\\global-scripts\\mcp-servers\\src\\filesystem\\dist\\index.js", "C:\\Users\\[USERNAME]\\global-scripts\\"],
+            "env": {}
+        },
+        "memory": {
+            "command": "node",
+            "args": ["C:\\Users\\[USERNAME]\\global-scripts\\mcp-servers\\src\\memory\\dist\\index.js"],
+            "env": {}
+        },
+        "everything": {
+            "command": "node",
+            "args": ["C:\\Users\\[USERNAME]\\global-scripts\\mcp-servers\\src\\everything\\dist\\index.js"],
+            "env": {}
+        },
+        "sequentialthinking": {
+            "command": "node",
+            "args": ["C:\\Users\\[USERNAME]\\global-scripts\\mcp-servers\\src\\sequentialthinking\\dist\\index.js"],
+            "env": {}
+        },
+        "fetch": {
+            "command": "C:\\Users\\[USERNAME]\\global-scripts\\mcp-servers\\src\\fetch\\venv\\Scripts\\python.exe",
+            "args": ["-m", "mcp_server_fetch"],
+            "cwd": "C:\\Users\\[USERNAME]\\global-scripts\\mcp-servers\\src\\fetch",
+            "env": {}
+        },
+        "git": {
+            "command": "C:\\Users\\[USERNAME]\\global-scripts\\mcp-servers\\src\\git\\venv\\Scripts\\python.exe",
+            "args": ["-m", "mcp_server_git", "C:\\Users\\[USERNAME]\\global-scripts\\"],
+            "cwd": "C:\\Users\\[USERNAME]\\global-scripts\\mcp-servers\\src\\git",
+            "env": {}
+        },
+        "time": {
+            "command": "C:\\Users\\[USERNAME]\\global-scripts\\mcp-servers\\src\\time\\venv\\Scripts\\python.exe",
+            "args": ["-m", "mcp_server_time"],
+            "cwd": "C:\\Users\\[USERNAME]\\global-scripts\\mcp-servers\\src\\time",
+            "env": {}
+        }
+    },
+    "officialServers": {
+        "description": "7個官方MCP服務器 (Microsoft Context Protocol Official)",
+        "servers": [
+            {
+                "name": "filesystem",
+                "purpose": "安全文件操作",
+                "type": "TypeScript",
+                "importance": "高"
+            },
+            {
+                "name": "memory", 
+                "purpose": "知識圖譜持久化記憶",
+                "type": "TypeScript",
+                "importance": "高"
+            },
+            {
+                "name": "everything",
+                "purpose": "參考/測試服務器", 
+                "type": "TypeScript",
+                "importance": "中"
+            },
+            {
+                "name": "sequentialthinking",
+                "purpose": "動態反思問題解決",
+                "type": "TypeScript", 
+                "importance": "高"
+            },
+            {
+                "name": "fetch",
+                "purpose": "網頁內容抓取轉換",
+                "type": "Python",
+                "importance": "高"
+            },
+            {
+                "name": "git",
+                "purpose": "Git倉庫操作",
+                "type": "Python",
+                "importance": "高"
+            },
+            {
+                "name": "time",
+                "purpose": "時間和時區轉換", 
+                "type": "Python",
+                "importance": "中"
+            }
+        ]
+    },
+    "specializedServers": {
+        "description": "2個專用MCP服務器 (特定用途)",
+        "servers": [
+            {
+                "name": "task-master-ai",
+                "purpose": "任務管理和項目規劃",
+                "type": "Node.js",
+                "importance": "高"
+            },
+            {
+                "name": "obsidian-xysb", 
+                "purpose": "知識庫整合 (Obsidian)",
+                "type": "Node.js",
+                "importance": "高"
+            }
+        ]
+    },
+    "deploymentNotes": {
+        "prerequisites": [
+            "安裝 Node.js 18+ (https://nodejs.org/)",
+            "安裝 Cursor IDE (https://cursor.com/)",
+            "確認 npm 可用 (npm --version)",
+            "建立 C:\\Users\\[USERNAME]\\global-scripts\\ 目錄"
+        ],
+        "deploymentSteps": [
+            "1. 替換 [USERNAME] 為實際Windows用戶名",
+            "2. 設定環境變數中的API Keys",
+            "3. 將此檔案複製到 Cursor 配置目錄", 
+            "4. 重啟Cursor IDE",
+            "5. 執行 windows-mcp-health-check.bat 驗證"
+        ],
+        "pathMapping": {
+            "macOS_xykms": "C:\\Users\\[USERNAME]\\global-scripts\\",
+            "macOS_documents": "C:\\Users\\[USERNAME]\\Documents\\",
+            "cursor_config": "C:\\Users\\[USERNAME]\\AppData\\Roaming\\Cursor\\User\\globalStorage\\cursor.mcp\\"
+        },
+        "serverCount": {
+            "total": 9,
+            "official": 7,
+            "specialized": 2
+        }
+    }
+} 
